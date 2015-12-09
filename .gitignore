@@ -1,0 +1,7 @@
+Packs.iml
+
+target/
+.idea/
+
+dependency-reduced-pom.xml
+
