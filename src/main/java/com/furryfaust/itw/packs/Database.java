@@ -29,7 +29,7 @@ public class Database {
                         .append("Name", alpha)
                         .append("Role", "Alpha")))
                 .append("Invited", Arrays.asList())
-                .append("Territory", Arrays.asList());
+                .append("Claims", Arrays.asList());
         collection.insertOne(pack);
     }
 
@@ -43,6 +43,12 @@ public class Database {
         FindIterable<Document> results = collection.find(new Document("Name", packName));
 
         return results.first() == null ? null : results.first();
+    }
+
+    public boolean disbandPack(UUID uuid) {
+        Document packQuery = new Document("Members", new Document("$elemMatch", new Document("Name", uuid.toString()).append("Role", "Alpha")));
+
+        return collection.deleteOne(packQuery).getDeletedCount() != 0;
     }
 
     public ArrayList<String> getMembers(String packName) {

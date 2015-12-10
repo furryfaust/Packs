@@ -26,45 +26,60 @@ public class Command implements CommandExecutor {
         switch (args[0]) {
             case "create":
                 if (player == null) {
-                    warn(commandSender, "You must be a player to create a pack.");
+                    message(commandSender, "&cYou must be a player to create a pack.");
                     return false;
                 }
 
                 if (pl.db.getPack(player.getUniqueId()) != null) {
-                    warn(player, "You are already in a pack.");
+                    message(player, "&cYou are already in a pack.");
                     return false;
                 }
 
                 if (args.length != 2) {
-                    warn(player, "Incorrect argument length.");
+                    message(player, "&cIncorrect argument length.");
                     return false;
                 }
 
                 pl.db.createPack(args[1], player.getUniqueId().toString());
-                player.sendMessage(toPackMessage(args[1], "&aYou have successfully created a pack."));
+                message(player, "&aYou have successfully created the pack " + args[1]);
                 return true;
             case "info":
                 if (args.length == 1 && player != null) {
                     Document pack = pl.db.getPack(player.getUniqueId());
                     if (pack == null) {
-                        warn(player, "You are not in a pack.");
+                        message(player, "&cYou are not in a pack.");
                         return false;
                     }
 
-                    player.sendMessage(toPackMessage(pack.getString("Name"), ""));
+                    message(player, "");
+                    return true;
                 }
                 return false;
+            case "disband":
+                if (player == null) {
+                    message(commandSender, "&cYou must be a player to create a pack.");
+                    return false;
+                }
+
+                if (pl.db.getPack(player.getUniqueId()) == null) {
+                    message(player, "&cYou are not in a pack.");
+                    return false;
+                }
+
+                if (!pl.db.disbandPack(player.getUniqueId())) {
+                    message(player, "&cYou are not the alpha of the pack.");
+                    return false;
+                }
+
+                message(player, "&aYou have disbanded your pack.");
+                return true;
         }
 
         return false;
     }
 
-    public void warn(CommandSender sender, String message) {
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c" + message));
-    }
-
-    public String toPackMessage(String packName, String message) {
-        return ChatColor.translateAlternateColorCodes('&', "&7[&9&l" + packName + "&7] " + message);
+    private void message(CommandSender sender, String message) {
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&9&lPacks&7] " + message));
     }
 
 }
