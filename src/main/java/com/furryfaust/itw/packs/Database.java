@@ -1,16 +1,12 @@
 package com.furryfaust.itw.packs;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.UUID;
 
 public class Database {
@@ -33,6 +29,12 @@ public class Database {
         collection.insertOne(pack);
     }
 
+    public boolean isAlpha(UUID uuid) {
+        FindIterable<Document> results = collection.find(new Document("Members", new Document("$elemMatch", new Document("Name", uuid.toString()).append("Role", "Alpha"))));
+
+        return results.first() != null;
+    }
+
     public Document getPack(UUID uuid) {
         FindIterable<Document> results = collection.find(new Document("Members", new Document("$elemMatch", new Document("Name", uuid.toString()))));
 
@@ -51,25 +53,18 @@ public class Database {
         return collection.deleteOne(packQuery).getDeletedCount() != 0;
     }
 
-    public ArrayList<String> getMembers(String packName) {
-        Document packQuery = getPack(packName);
-        if (packQuery == null) {
-            return null;
+    public boolean inviteToPack(UUID uuid, String packName) {
+        Document inviteCheck = new Document()
+                .append("Name", packName)
+                .append("Invited", uuid.toString());
+
+        FindIterable<Document> results = collection.find(inviteCheck);
+        if (results.first() != null) {
+            return false;
         }
 
-        final ArrayList<String> members = new ArrayList<String>();
-        BasicDBList dbList = (BasicDBList) packQuery.get("Members");
-
-        Iterator<Object> iterator = dbList.iterator();
-        while (iterator.hasNext()) {
-            String uuid = (String) iterator.next();
-
-            members.add(Bukkit.getServer().getPlayer(UUID.fromString(uuid)) != null ?
-                    Bukkit.getServer().getPlayer(UUID.fromString(uuid)).getName() :
-                    Bukkit.getServer().getOfflinePlayer(UUID.fromString(uuid)).getName());
-        }
-
-        return members;
+        collection.updateOne(new Document("Name", packName), new Document("$push", new Document("Invited", uuid.toString())));
+        return true;
     }
 
 }

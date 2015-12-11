@@ -6,6 +6,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class Command implements CommandExecutor {
 
     Packs pl;
@@ -36,7 +38,7 @@ public class Command implements CommandExecutor {
                 }
 
                 if (args.length != 2) {
-                    message(player, "&cIncorrect argument length.");
+                    message(player, "&cIncorrect arguments length.");
                     return false;
                 }
 
@@ -57,7 +59,7 @@ public class Command implements CommandExecutor {
                 return false;
             case "disband":
                 if (player == null) {
-                    message(commandSender, "&cYou must be a player to create a pack.");
+                    message(commandSender, "&cYou must be a player to disband a pack.");
                     return false;
                 }
 
@@ -72,6 +74,47 @@ public class Command implements CommandExecutor {
                 }
 
                 message(player, "&aYou have disbanded your pack.");
+                return true;
+            case "invite":
+                if (player == null) {
+                    message(commandSender, "&cYou must be a player to invite a player to a pack.");
+                    return false;
+                }
+
+                if (args.length != 2) {
+                    message(player, "&cIncorrect arguments length.");
+                    return false;
+                }
+
+                Document pack = pl.db.getPack(player.getUniqueId());
+                if (pack == null) {
+                    message(player, "&cYou are not in a pack.");
+                    return false;
+                }
+
+                if (player.getName() == args[1]) {
+                    message(player, "&cYou cannot invite yourself to a pack.");
+                    return false;
+                }
+
+                Player invited = pl.getServer().getPlayer(args[1]);
+                if (invited == null) {
+                    message(player, "&cYou cannot invite an offline player.");
+                    return false;
+                }
+
+                if (pl.db.getPack(invited.getUniqueId()) != null) {
+                    message(player, "&cYou cannot invite someone already in a pack.");
+                    return false;
+                }
+
+                if (!pl.db.inviteToPack(invited.getUniqueId(), pack.getString("Name"))) {
+                    message(player, "&cYou have already invited this player.");
+                    return false;
+                }
+
+                message(player, "&aYou have invited " + args[1] + " to your pack.");
+                message(invited, "&aYou have been invited to " + pack.getString("Name"));
                 return true;
         }
 
