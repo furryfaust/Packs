@@ -6,8 +6,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
-
 public class Command implements CommandExecutor {
 
     Packs pl;
@@ -97,7 +95,7 @@ public class Command implements CommandExecutor {
                     return false;
                 }
 
-                Player invited = pl.getServer().getPlayer(args[1]);
+                Player invited = pl.getServer().getPlayerExact(args[1]);
                 if (invited == null) {
                     message(player, "&cYou cannot invite an offline player.");
                     return false;
@@ -116,6 +114,8 @@ public class Command implements CommandExecutor {
                 message(player, "&aYou have invited " + args[1] + " to your pack.");
                 message(invited, "&aYou have been invited to " + pack.getString("Name"));
                 return true;
+            case "join":
+
         }
 
         return false;

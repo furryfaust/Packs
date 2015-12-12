@@ -67,4 +67,10 @@ public class Database {
         return true;
     }
 
+    public void stripeInvites(UUID uuid) {
+        Document inviteQuery = new Document("Invited", uuid.toString());
+
+        collection.updateMany(inviteQuery, new Document("$pull", new Document("Invited", uuid.toString())));
+    }
+
 }
