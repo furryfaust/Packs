@@ -73,4 +73,11 @@ public class Database {
         collection.updateMany(inviteQuery, new Document("$pull", new Document("Invited", uuid.toString())));
     }
 
+    public boolean joinPack(UUID uuid, String packName) {
+
+
+
+        return true;
+    }
+
 }

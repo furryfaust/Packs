@@ -40,6 +40,12 @@ public class Command implements CommandExecutor {
                     return false;
                 }
 
+                if (pl.db.getPack(args[1]) != null) {
+                    message(player, "&cThis pack name is taken.");
+                    return false;
+                }
+
+
                 pl.db.createPack(args[1], player.getUniqueId().toString());
                 message(player, "&aYou have successfully created the pack " + args[1]);
                 return true;
@@ -115,6 +121,7 @@ public class Command implements CommandExecutor {
                 message(invited, "&aYou have been invited to " + pack.getString("Name"));
                 return true;
             case "join":
+
 
         }
 
