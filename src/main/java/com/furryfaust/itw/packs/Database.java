@@ -3,6 +3,7 @@ package com.furryfaust.itw.packs;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -21,6 +22,7 @@ public class Database {
     public void createPack(String packName, String alpha) {
         Document pack = new Document()
                 .append("Name", packName)
+                .append("Name_lwr", packName.toLowerCase())
                 .append("Members", Arrays.asList(new Document()
                         .append("Name", alpha)
                         .append("Role", "Alpha")))
@@ -42,7 +44,7 @@ public class Database {
     }
 
     public Document getPack(String packName) {
-        FindIterable<Document> results = collection.find(new Document("Name", packName));
+        FindIterable<Document> results = collection.find(new Document("Name_lwr", packName.toLowerCase()));
 
         return results.first() == null ? null : results.first();
     }
@@ -55,7 +57,7 @@ public class Database {
 
     public boolean inviteToPack(UUID uuid, String packName) {
         Document inviteCheck = new Document()
-                .append("Name", packName)
+                .append("Name_lwr", packName.toLowerCase())
                 .append("Invited", uuid.toString());
 
         FindIterable<Document> results = collection.find(inviteCheck);
@@ -74,10 +76,29 @@ public class Database {
     }
 
     public boolean joinPack(UUID uuid, String packName) {
+        Document packQuery = new Document("Name_lwr", packName.toLowerCase());
 
+        UpdateResult result = collection.updateOne(packQuery,
+                new Document("$pull", new Document("Invited", uuid.toString())));
 
+        if (result.getModifiedCount() == 0) {
+            return false;
+        }
+        stripeInvites(uuid);
 
+        Document member = new Document()
+                .append("Name", uuid.toString())
+                .append("Role", "Beta");
+
+        collection.updateOne(packQuery,
+                new Document("$push", new Document("Members", member)));
         return true;
+    }
+
+    public void leavePack(UUID uuid, String packName) {
+        Document packQuery = new Document("Name_lwr", packName.toLowerCase());
+
+
     }
 
 }

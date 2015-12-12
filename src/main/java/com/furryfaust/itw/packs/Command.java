@@ -16,13 +16,12 @@ public class Command implements CommandExecutor {
 
     public boolean onCommand(CommandSender commandSender, org.bukkit.command.Command command, String cmd, String[] args) {
         Player player = null;
-        if (commandSender instanceof Player) {
+        if (commandSender instanceof Player)
             player = (Player) commandSender;
-        }
 
-        if (args.length == 0) {
+        if (args.length == 0)
             return true;
-        }
+
         switch (args[0]) {
             case "create":
                 if (player == null) {
@@ -96,7 +95,7 @@ public class Command implements CommandExecutor {
                     return false;
                 }
 
-                if (player.getName() == args[1]) {
+                if (player.getName().equals(args[1])) {
                     message(player, "&cYou cannot invite yourself to a pack.");
                     return false;
                 }
@@ -121,10 +120,36 @@ public class Command implements CommandExecutor {
                 message(invited, "&aYou have been invited to " + pack.getString("Name"));
                 return true;
             case "join":
+                if (player == null) {
+                    message(commandSender, "&cYou must be a player to join a pack.");
+                    return false;
+                }
 
+                if (args.length != 2) {
+                    message(player, "&cIncorrect arguments length.");
+                    return false;
+                }
+
+                if (pl.db.getPack(player.getUniqueId()) != null) {
+                    message(player, "&cYou are already in a pack.");
+                    return false;
+                }
+
+                if (pl.db.getPack(args[1]) == null) {
+                    message(player, "&cThis pack does not exist.");
+                    return false;
+                }
+
+                if (!pl.db.joinPack(player.getUniqueId(), args[1])) {
+                    message(player, "&cYou have not been invited to this pack.");
+                    return false;
+                }
+
+                message(player, "&cYou joined the pack " + args[1]);
+                return true;
+            case "leave":
 
         }
-
         return false;
     }
 
