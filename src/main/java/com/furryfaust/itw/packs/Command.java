@@ -148,7 +148,24 @@ public class Command implements CommandExecutor {
                 message(player, "&cYou joined the pack " + args[1]);
                 return true;
             case "leave":
+                if (player == null) {
+                    message(commandSender, "&cYou must be a player to leave a pack.");
+                    return false;
+                }
 
+                if (pl.db.getPack(player.getUniqueId()) == null) {
+                    message(player, "&cYou are not in a pack.");
+                    return false;
+                }
+
+                if (pl.db.isAlpha(player.getUniqueId())) {
+                    message(player, "&cYou cannot leave a pack you are alpha of.");
+                    return false;
+                }
+
+                pl.db.leavePack(player.getUniqueId(), pl.db.getPack(player.getUniqueId()).getString("Name"));
+                message(player, "&aYou have left your pack.");
+                return true;
         }
         return false;
     }

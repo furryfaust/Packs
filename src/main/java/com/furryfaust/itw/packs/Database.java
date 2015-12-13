@@ -96,9 +96,12 @@ public class Database {
     }
 
     public void leavePack(UUID uuid, String packName) {
-        Document packQuery = new Document("Name_lwr", packName.toLowerCase());
+        Document packQuery = new Document("Name_lwr", packName.toLowerCase()),
+                update = new Document("$pull", new Document("Members", new Document()
+                    .append("Name", uuid.toString())
+                    .append("Role", "Beta")));
 
-
+        collection.updateOne(packQuery, update);
     }
 
 }
