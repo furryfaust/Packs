@@ -5,6 +5,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+
 public class Command implements CommandExecutor {
 
     Packs pl;
@@ -34,6 +36,10 @@ public class Command implements CommandExecutor {
                 return join(player, commandSender, args);
             case "leave":
                 return leave(player, commandSender, args);
+            case "claim":
+                return claim(player, commandSender, args);
+            case "declaim":
+                return declaim(player, commandSender, args);
         }
         return false;
     }
@@ -72,12 +78,7 @@ public class Command implements CommandExecutor {
                 message(player, "&cYou are not in a pack.");
                 return false;
             }
-
-            System.out.println(pack.getAlpha());
-            System.out.println(pack.getOnlineMembers());
-            System.out.println(pack.getOfflineMembers());
-
-            message(player, "=============");
+            pack.info(commandSender);
             return true;
         }
         return false;
@@ -100,7 +101,7 @@ public class Command implements CommandExecutor {
             return false;
         }
 
-        pack.sendAll("&a" + player.getName() + "disbanded the pack.");
+        pack.sendAll("&a" + player.getName() + " disbanded the pack.");
         return true;
     }
 
@@ -197,6 +198,16 @@ public class Command implements CommandExecutor {
 
         pl.db.leavePack(player.getUniqueId(), pl.db.getPack(player.getUniqueId()).getString("Name"));
         message(player, "&aYou have left your pack.");
+        return true;
+    }
+
+    public boolean claim(Player player, CommandSender commandSender, String[] args) {
+
+        return true;
+    }
+
+    public boolean declaim(Player player, CommandSender commandSender, String[] args) {
+
         return true;
     }
 

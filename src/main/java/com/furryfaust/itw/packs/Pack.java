@@ -4,6 +4,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class Pack {
     }
 
     public String getName() {
-        return packInfo.getString("Name_lwr");
+        return packInfo.getString("Name");
     }
 
     public boolean exists() {
@@ -70,6 +71,38 @@ public class Pack {
         List<String> onlineMembers = getOnlineMembers();
         for (String name : onlineMembers) {
             Bukkit.getPlayer(name).sendMessage(message);
+        }
+    }
+
+    public void info(CommandSender sender) {
+        String name = getName(),
+                alpha = getAlpha();
+
+        List<String> online = getOnlineMembers(),
+                offline = getOfflineMembers();
+
+        int totalMembers = online.size() + offline.size();
+
+        ArrayList<String> info = new ArrayList<>();
+        info.add("&a|---------[&b" + name + "&a]---------|");
+        info.add("&aMEMBERS    CLAIMS    MAX CLAIMS");
+        info.add("&b" + totalMembers + "            " + " " + "             " + (totalMembers * 3));
+        StringBuilder onlineBuilder = new StringBuilder();
+        for (String s : online) {
+            onlineBuilder.append(" ").append(s.equals(alpha) ? "*" + s : s).append(" |");
+        }
+
+        info.add("&aOnline Members:&b" + onlineBuilder.toString());
+
+        StringBuilder offlineBuilder = new StringBuilder();
+        for (String s : offline) {
+            offlineBuilder.append(" ").append(s.equals(alpha) ? "*" + s : s).append(" |");
+        }
+
+        info.add("&aOffline Members:&b" + offlineBuilder.toString());
+
+        for (String s : info) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s));
         }
     }
 
