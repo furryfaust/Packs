@@ -5,6 +5,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Arrays;
@@ -29,12 +30,6 @@ public class Database {
                 .append("Invited", Arrays.asList())
                 .append("Claims", Arrays.asList());
         collection.insertOne(pack);
-    }
-
-    public boolean isAlpha(UUID uuid) {
-        FindIterable<Document> results = collection.find(new Document("Members", new Document("$elemMatch", new Document("Name", uuid.toString()).append("Role", "Alpha"))));
-
-        return results.first() != null;
     }
 
     public Document getPack(UUID uuid) {
@@ -98,8 +93,8 @@ public class Database {
     public void leavePack(UUID uuid, String packName) {
         Document packQuery = new Document("Name_lwr", packName.toLowerCase()),
                 update = new Document("$pull", new Document("Members", new Document()
-                    .append("Name", uuid.toString())
-                    .append("Role", "Beta")));
+                        .append("Name", uuid.toString())
+                        .append("Role", "Beta")));
 
         collection.updateOne(packQuery, update);
     }
