@@ -194,7 +194,7 @@ public class Command implements CommandExecutor {
             return false;
         }
 
-        pl.db.leavePack(player.getUniqueId(), pl.db.getPack(player.getUniqueId()).getString("Name"));
+        pl.db.leavePack(player.getUniqueId());
         message(player, "&aYou have left your pack.");
         return true;
     }
@@ -228,7 +228,31 @@ public class Command implements CommandExecutor {
     }
 
     public boolean declaim(Player player, CommandSender commandSender, String[] args) {
+        if (player == null) {
+            message(commandSender, "&cYou must be a player to claim a chunk.");
+            return false;
+        }
 
+        Pack pack = new Pack(pl.db.getPack(player.getUniqueId()));
+        if (pack == null) {
+            message(player, "&cYou are not in a pack.");
+            return false;
+        }
+
+        Pack claimer = new Pack(pl.db.getPackAtChunk(player.getLocation().getChunk()));
+        if (!claimer.exists()) {
+            message(player, "&cThis chunk has not been claimed.");
+            return false;
+        }
+
+        if (!claimer.getName().equals(pack.getName())) {
+            message(player, "&cThis chunk is claimed by another pack.");
+            return false;
+        }
+
+        pl.db.declaim(player.getLocation().getChunk());
+        pack.sendAll("&a" + player.getName() + " declaimed land at X: " + (int) player.getLocation().getX() + " Y: "
+                + (int) player.getLocation().getZ() + " World: " + player.getWorld().getName() + ".");
         return true;
     }
 

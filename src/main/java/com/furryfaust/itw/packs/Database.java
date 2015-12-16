@@ -90,13 +90,12 @@ public class Database {
         return true;
     }
 
-    public void leavePack(UUID uuid, String packName) {
-        Document packQuery = new Document("Name_lwr", packName.toLowerCase()),
-                update = new Document("$pull", new Document("Members", new Document()
-                        .append("Name", uuid.toString())
-                        .append("Role", "Beta")));
+    public void leavePack(UUID uuid) {
+        Document member = new Document()
+                .append("Name", uuid.toString())
+                .append("Role", "Beta");
 
-        collection.updateOne(packQuery, update);
+        collection.updateOne(new Document("Members", member), new Document("$pull", new Document("Members", member)));
     }
 
     public Document getPackAtChunk(Chunk chunk) {
@@ -119,6 +118,15 @@ public class Database {
         Document packQuery = new Document("Name_lwr", packName.toLowerCase());
 
         collection.updateOne(packQuery, new Document("$push", new Document("Claims", claim)));
+    }
+
+    public void declaim(Chunk chunk) {
+        Document claim = new Document()
+                .append("World", chunk.getWorld().getName())
+                .append("X", chunk.getX())
+                .append("Z", chunk.getZ());
+
+        collection.updateOne(new Document("Claims", claim), new Document("$pull", new Document("Claims", claim)));
     }
 
 }
