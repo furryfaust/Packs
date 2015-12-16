@@ -5,7 +5,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
-import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Arrays;
@@ -35,13 +35,13 @@ public class Database {
     public Document getPack(UUID uuid) {
         FindIterable<Document> results = collection.find(new Document("Members", new Document("$elemMatch", new Document("Name", uuid.toString()))));
 
-        return results.first() == null ? null : results.first();
+        return results.first();
     }
 
     public Document getPack(String packName) {
         FindIterable<Document> results = collection.find(new Document("Name_lwr", packName.toLowerCase()));
 
-        return results.first() == null ? null : results.first();
+        return results.first();
     }
 
     public boolean disbandPack(UUID uuid) {
@@ -97,6 +97,28 @@ public class Database {
                         .append("Role", "Beta")));
 
         collection.updateOne(packQuery, update);
+    }
+
+    public Document getPackAtChunk(Chunk chunk) {
+        Document claimQuery = new Document("Claims", new Document()
+                .append("World", chunk.getWorld().getName())
+                .append("X", chunk.getX())
+                .append("Z", chunk.getZ()));
+
+        FindIterable<Document> results = collection.find(claimQuery);
+
+        return results.first();
+    }
+
+    public void claim(Chunk chunk, String packName) {
+        Document claim = new Document()
+                .append("World", chunk.getWorld().getName())
+                .append("X", chunk.getX())
+                .append("Z", chunk.getZ());
+
+        Document packQuery = new Document("Name_lwr", packName.toLowerCase());
+
+        collection.updateOne(packQuery, new Document("$push", new Document("Claims", claim)));
     }
 
 }

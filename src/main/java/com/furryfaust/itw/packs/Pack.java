@@ -66,6 +66,18 @@ public class Pack {
         return players;
     }
 
+    public int getClaimCount() {
+        return ((ArrayList<Document>) packInfo.get("Claims")).size();
+    }
+
+    public int getMaxClaims() {
+        return getMemberCount() * 3;
+    }
+
+    public int getMemberCount() {
+        return ((ArrayList<Document>) packInfo.get("Members")).size();
+    }
+
     public void sendAll(String message) {
         message = ChatColor.translateAlternateColorCodes('&', "&7[&9&l" + getName() + "&7] " + message);
         List<String> onlineMembers = getOnlineMembers();
@@ -81,12 +93,10 @@ public class Pack {
         List<String> online = getOnlineMembers(),
                 offline = getOfflineMembers();
 
-        int totalMembers = online.size() + offline.size();
-
         ArrayList<String> info = new ArrayList<>();
         info.add("&a|---------[&b" + name + "&a]---------|");
         info.add("&aMEMBERS    CLAIMS    MAX CLAIMS");
-        info.add("&b" + totalMembers + "            " + " " + "             " + (totalMembers * 3));
+        info.add("&b" + getMemberCount() + "             " + getClaimCount() + "           " + getMaxClaims());
         StringBuilder onlineBuilder = new StringBuilder();
         for (String s : online) {
             onlineBuilder.append(" ").append(s.equals(alpha) ? "*" + s : s).append(" |");

@@ -5,8 +5,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-
 public class Command implements CommandExecutor {
 
     Packs pl;
@@ -175,7 +173,7 @@ public class Command implements CommandExecutor {
             return false;
         }
 
-        pack.sendAll("&c" + player.getName() + " joined the pack.");
+        pack.sendAll("&a" + player.getName() + " joined the pack.");
         return true;
     }
 
@@ -202,7 +200,30 @@ public class Command implements CommandExecutor {
     }
 
     public boolean claim(Player player, CommandSender commandSender, String[] args) {
+        if (player == null) {
+            message(commandSender, "&cYou must be a player to claim a chunk.");
+            return false;
+        }
 
+        Pack pack = new Pack(pl.db.getPack(player.getUniqueId()));
+        if (pack == null) {
+            message(player, "&cYou are not in a pack.");
+            return false;
+        }
+
+        if (pl.db.getPackAtChunk(player.getLocation().getChunk()) != null) {
+            message(player, "&cThis chunk has already been claimed.");
+            return false;
+        }
+
+        if (pack.getClaimCount() >= pack.getMaxClaims()) {
+            message(player, "&cYour pack has reached the maximum claims.");
+            return false;
+        }
+
+        pl.db.claim(player.getLocation().getChunk(), pack.getName());
+        pack.sendAll("&a" + player.getName() + " claimed land at X: " + (int) player.getLocation().getX() + " Y: "
+                + (int) player.getLocation().getZ() + " World: " + player.getWorld().getName() + ".");
         return true;
     }
 
