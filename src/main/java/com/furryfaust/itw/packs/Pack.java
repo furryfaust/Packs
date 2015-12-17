@@ -94,7 +94,7 @@ public class Pack {
                 offline = getOfflineMembers();
 
         ArrayList<String> info = new ArrayList<>();
-        info.add("&a|---------[&b" + name + "&a]---------|");
+        info.add("&a|---------[&b&l" + name + "&a]---------|");
         info.add("&aMEMBERS    CLAIMS    MAX CLAIMS");
         info.add("&b" + getMemberCount() + "             " + getClaimCount() + "           " + getMaxClaims());
         StringBuilder onlineBuilder = new StringBuilder();

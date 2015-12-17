@@ -18,13 +18,8 @@
     <dependencies>
         <dependency>
             <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver</artifactId>
-            <version>3.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>bson</artifactId>
-            <version>3.1.1</version>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.2.0</version>
         </dependency>
 
         <dependency>
@@ -70,7 +65,6 @@
                             <excludes>
                                 <exclude>META-INF/</exclude>
                             </excludes>
-                            <artifact>bson</artifact>
                         </filter>
                     </filters>
                 </configuration>
