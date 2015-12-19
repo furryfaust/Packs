@@ -1,6 +1,7 @@
 package com.furryfaust.itw.packs;
 
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -54,8 +55,8 @@ public class Listener implements org.bukkit.event.Listener {
 
         String claimer = pack.exists() ? pack.getName() : "";
         String message = claimer.equals("") ?
-                "You entered the wilderness." :
-                "You entered " + claimer + "'s territory.";
+                "&bYou entered the wilderness." :
+                "&bYou entered " + claimer + "'s territory.";
 
         if (!claimer.equals(previous)) {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
@@ -73,16 +74,32 @@ public class Listener implements org.bukkit.event.Listener {
             return;
         }
 
+        Chunk chunk = event.getClickedBlock().getChunk();
+        int x = player.getMetadata("chunk_x").get(0).asInt(),
+                z = player.getMetadata("chunk_z").get(0).asInt();
+
         Pack pack = new Pack(pl.db.getPack(event.getPlayer().getUniqueId()));
-        Pack claimer = new Pack(pl.db.getPackAtChunk(event.getClickedBlock().getChunk()));
 
-        if (!claimer.exists()) {
-            return;
-        }
+        if (x == chunk.getX() && z == chunk.getZ()) {
+            String curr = player.getMetadata("chunk").get(0).asString();
+            if (curr == "") {
+                return;
+            }
 
-        if (!pack.exists() || pack.exists() && !pack.getName().equals(claimer.getName())) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou cannot interact with blocks in " + claimer.getName() + "'s territory"));
-            event.setCancelled(true);
+            if (!curr.equals(pack.getName())) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou cannot interact with blocks in " + curr + "'s territory"));
+                event.setCancelled(true);
+            }
+        } else {
+            Pack claimer = new Pack(pl.db.getPackAtChunk(event.getClickedBlock().getChunk()));
+            if (!claimer.exists()) {
+                return;
+            }
+
+            if (!pack.exists() || pack.exists() && !pack.getName().equals(claimer.getName())) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou cannot interact with blocks in " + claimer.getName() + "'s territory"));
+                event.setCancelled(true);
+            }
         }
     }
 }

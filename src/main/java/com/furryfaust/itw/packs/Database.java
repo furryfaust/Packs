@@ -1,6 +1,8 @@
 package com.furryfaust.itw.packs;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.UpdateResult;
@@ -15,7 +17,8 @@ public class Database {
     MongoCollection<Document> collection;
 
     public Database(FileConfiguration config) {
-        MongoClient client = new MongoClient();
+        MongoClientURI uri = new MongoClientURI("mongodb://localhost:27017", MongoClientOptions.builder().socketKeepAlive(true));
+        MongoClient client = new MongoClient(uri);
 
         collection = client.getDatabase(config.getString("MongoDB.DBName")).getCollection(config.getString("MongoDB.Collection"));
     }

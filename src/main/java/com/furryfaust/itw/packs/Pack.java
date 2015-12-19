@@ -86,6 +86,11 @@ public class Pack {
         }
     }
 
+    public void send(CommandSender sender, String message) {
+        message = ChatColor.translateAlternateColorCodes('&', "&7[&9&l" + getName() + "&7] " + message);
+        sender.sendMessage(message);
+    }
+
     public void info(CommandSender sender) {
         String name = getName(),
                 alpha = getAlpha();

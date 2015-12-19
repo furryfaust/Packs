@@ -173,7 +173,9 @@ public class Command implements CommandExecutor {
             return false;
         }
 
-        pack.sendAll("&a" + player.getName() + " joined the pack.");
+        String message = "&a" + player.getName() + " joined the pack.";
+        pack.sendAll(message);
+        pack.send(player, message);
         return true;
     }
 
