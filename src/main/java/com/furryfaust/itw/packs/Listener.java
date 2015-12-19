@@ -1,7 +1,11 @@
 package com.furryfaust.itw.packs;
 
 import net.md_5.bungee.api.ChatColor;
+import net.minecraft.server.v1_8_R3.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.v1_8_R3.IChatBaseComponent;
+import net.minecraft.server.v1_8_R3.v1_8_R3.PacketPlayOutTitle;
 import org.bukkit.Chunk;
+import org.bukkit.craftbukkit.v1_8_R3.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -55,11 +59,12 @@ public class Listener implements org.bukkit.event.Listener {
 
         String claimer = pack.exists() ? pack.getName() : "";
         String message = claimer.equals("") ?
-                "&bYou entered the wilderness." :
-                "&bYou entered " + claimer + "'s territory.";
+                "&cWilderness" :
+                "&c" + claimer + "'s Territory";
 
         if (!claimer.equals(previous)) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+            sendEnterTitle(player, ChatColor.translateAlternateColorCodes('&', message));
+            player.sendMessage(message);
             player.removeMetadata("chunk", pl);
             player.setMetadata("chunk", new FixedMetadataValue(pl, claimer));
         }
@@ -101,5 +106,17 @@ public class Listener implements org.bukkit.event.Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    private void sendEnterTitle(Player player, String territory) {
+        EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+
+        IChatBaseComponent title = IChatBaseComponent.ChatSerializer.a("{\"text\":\"Entering\"}");
+        PacketPlayOutTitle titlePacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, title, 1, 2, 1);
+        entityPlayer.playerConnection.sendPacket(titlePacket);
+
+        IChatBaseComponent subtitle = IChatBaseComponent.ChatSerializer.a("{\"text\":\"" + territory + "\"}");
+        PacketPlayOutTitle subtitlePacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subtitle, 1, 2, 1);
+        entityPlayer.playerConnection.sendPacket(subtitlePacket);
     }
 }

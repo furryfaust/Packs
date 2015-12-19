@@ -58,6 +58,16 @@ public class Command implements CommandExecutor {
             return false;
         }
 
+        if (args[1].length() < 4) {
+            message(player, "&cThe name must be longer than four characters.");
+            return false;
+        }
+
+        if (args[1].length() > 11) {
+            message(player, "&cThe name must not be longer than ten characters.");
+            return false;
+        }
+
         if (pl.db.getPack(args[1]) != null) {
             message(player, "&cThis pack name is taken.");
             return false;
