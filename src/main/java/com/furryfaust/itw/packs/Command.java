@@ -5,6 +5,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class Command implements CommandExecutor {
 
     Packs pl;
@@ -32,6 +34,8 @@ public class Command implements CommandExecutor {
                 return invite(player, commandSender, args);
             case "join":
                 return join(player, commandSender, args);
+            case "kick":
+                return kick(player, commandSender, args);
             case "leave":
                 return leave(player, commandSender, args);
             case "claim":
@@ -153,6 +157,45 @@ public class Command implements CommandExecutor {
 
         pack.sendAll("&a" + player.getName() + " invited " + args[1] + " to the pack.");
         message(invited, "&aYou have been invited to " + pack.getName());
+        return true;
+    }
+
+    public boolean kick(Player player, CommandSender commandSender, String[] args) {
+        if (player == null) {
+            message(commandSender, "&cYou must be a player to kick a player from a pack.");
+            return false;
+        }
+
+        if (args.length != 2) {
+            message(player, "&cIncorrect arguments length.");
+            return false;
+        }
+
+        Pack pack = new Pack(pl.db.getPack(player.getUniqueId()));
+        if (!pack.exists()) {
+            message(player, "&cYou are not in a pack.");
+            return false;
+        }
+
+        if (!pack.getAlpha().equals(player.getName())) {
+            message(player, "&cYou must be alpha to kick a player.");
+            return false;
+        }
+
+        if (pack.getAlpha().equals(args[1])) {
+            message(player, "&cYou cannot kick yourself from the pack.");
+            return false;
+        }
+
+        UUID uuid = pack.getUUID(args[1]);
+        if (uuid == null) {
+            message(player, "&cThere is no " + args[1] + " in your pack.");
+            return false;
+        }
+
+        pl.db.leavePack(uuid);
+        String message = "&a" + args[1] + " got kicked from the pack.";
+        pack.sendAll(message);
         return true;
     }
 

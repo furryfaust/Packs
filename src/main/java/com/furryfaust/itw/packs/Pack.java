@@ -36,6 +36,17 @@ public class Pack {
         return null;
     }
 
+    public UUID getUUID(String playerName) {
+        ArrayList<Document> members = (ArrayList<Document>) packInfo.get("Members");
+        for (Document doc : members) {
+            UUID uuid = UUID.fromString(doc.getString("Name"));
+            if (Bukkit.getOfflinePlayer(uuid).getName().equals(playerName)) {
+                return uuid;
+            }
+        }
+        return null;
+    }
+
     public List<String> getOnlineMembers() {
         List<String> players = new ArrayList<>();
 

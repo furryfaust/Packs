@@ -60,11 +60,10 @@ public class Listener implements org.bukkit.event.Listener {
         String claimer = pack.exists() ? pack.getName() : "";
         String message = claimer.equals("") ?
                 "&cWilderness" :
-                "&c" + claimer + "'s Territory";
+                "&b" + claimer + "'s Territory";
 
         if (!claimer.equals(previous)) {
             sendEnterTitle(player, ChatColor.translateAlternateColorCodes('&', message));
-            player.sendMessage(message);
             player.removeMetadata("chunk", pl);
             player.setMetadata("chunk", new FixedMetadataValue(pl, claimer));
         }
