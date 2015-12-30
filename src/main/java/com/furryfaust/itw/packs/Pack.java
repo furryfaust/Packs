@@ -54,12 +54,22 @@ public class Pack {
         return elders;
     }
 
+    public String getRole(UUID uuid) {
+        ArrayList<Document> members = (ArrayList<Document>) packInfo.get("Members");
+        for (Document doc : members) {
+            if (doc.getString("Name").equals(uuid.toString())) {
+                return doc.getString("Role");
+            }
+        }
+
+        return null;
+    }
 
     public UUID getUUID(String playerName) {
         ArrayList<Document> members = (ArrayList<Document>) packInfo.get("Members");
         for (Document doc : members) {
             UUID uuid = UUID.fromString(doc.getString("Name"));
-            if (Bukkit.getOfflinePlayer(uuid).getName().equals(playerName)) {
+            if (Bukkit.getOfflinePlayer(uuid).getName().equalsIgnoreCase(playerName)) {
                 return uuid;
             }
         }

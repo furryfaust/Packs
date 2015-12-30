@@ -140,7 +140,12 @@ public class Command implements CommandExecutor {
             return false;
         }
 
-        if (player.getName().equals(args[1])) {
+        if (pack.getRole(player.getUniqueId()).equals("Member")) {
+            message(player, "&cYou must be an elder or alpha to claim land.");
+            return false;
+        }
+
+        if (player.getName().equalsIgnoreCase(args[1])) {
             message(player, "&cYou cannot invite yourself to a pack.");
             return false;
         }
@@ -183,19 +188,19 @@ public class Command implements CommandExecutor {
             return false;
         }
 
-        if (!pack.getAlpha().equals(player.getName())) {
+        if (!pack.getAlpha().equalsIgnoreCase(player.getName())) {
             message(player, "&cYou must be alpha to kick a player.");
             return false;
         }
 
-        if (pack.getAlpha().equals(args[1])) {
+        if (pack.getAlpha().equalsIgnoreCase(args[1])) {
             message(player, "&cYou cannot kick yourself from the pack.");
             return false;
         }
 
         UUID uuid = pack.getUUID(args[1]);
         if (uuid == null) {
-            message(player, "&cThere is no " + args[1] + " in your pack.");
+            message(player, "&cThere is no " + args[1] + " in the pack.");
             return false;
         }
 
@@ -256,7 +261,7 @@ public class Command implements CommandExecutor {
         }
 
         pl.db.leavePack(player.getUniqueId());
-        pack.sendAll("&a" + player.getName() + " have left your pack.");
+        pack.sendAll("&a" + player.getName() + " have left the pack.");
         return true;
     }
 
@@ -272,13 +277,18 @@ public class Command implements CommandExecutor {
             return false;
         }
 
+        if (pack.getRole(player.getUniqueId()).equals("Member")) {
+            message(player, "&cYou must be an elder or alpha to claim land.");
+            return false;
+        }
+
         if (pl.db.getPackAtChunk(player.getLocation().getChunk()) != null) {
             message(player, "&cThis chunk has already been claimed.");
             return false;
         }
 
         if (pack.getClaimCount() >= pack.getMaxClaims()) {
-            message(player, "&cYour pack has reached the maximum claims.");
+            message(player, "&cThe pack has reached the maximum claims.");
             return false;
         }
 
@@ -307,6 +317,11 @@ public class Command implements CommandExecutor {
             return false;
         }
 
+        if (pack.getRole(player.getUniqueId()).equals("Member")) {
+            message(player, "&cYou must be an elder or alpha to declaim land.");
+            return false;
+        }
+
         Pack claimer = new Pack(pl.db.getPackAtChunk(player.getLocation().getChunk()));
         if (!claimer.exists()) {
             message(player, "&cThis chunk has not been claimed.");
@@ -324,6 +339,40 @@ public class Command implements CommandExecutor {
     }
 
     public boolean promote(Player player, CommandSender commandSender, String[] args) {
+        if (player == null) {
+            message(commandSender, "&cYou must be a player to promote a player.");
+            return false;
+        }
+
+        Pack pack = new Pack(pl.db.getPack(player.getUniqueId()));
+        if (!pack.exists()) {
+            message(player, "&cYou are not in a pack.");
+            return false;
+        }
+
+        if (!pack.getAlpha().equalsIgnoreCase(player.getName())) {
+            message(player, "&cYou have to be alpha in order to promote a player.");
+            return false;
+        }
+
+        if (player.getName().equalsIgnoreCase(args[1])) {
+            message(player, "&cYou cannot promote yourself.");
+            return false;
+        }
+
+        UUID uuid = pack.getUUID(args[1]);
+        if (uuid == null) {
+            message(player, "&cThis player is not in the pack");
+            return false;
+        }
+
+        if (!pack.getRole(uuid).equals("Member")) {
+            message(player, "&cThis player is already an elder.");
+            return false;
+        }
+
+        pl.db.toElder(uuid);
+        pack.sendAll("&c" + args[1] + " has been promoted to elder.");
         return true;
     }
 
