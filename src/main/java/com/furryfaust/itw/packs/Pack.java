@@ -3,14 +3,19 @@ package com.furryfaust.itw.packs;
 import net.md_5.bungee.api.ChatColor;
 import org.bson.Document;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class Pack {
+
+    public static final ItemStack CLAIM_COST = new ItemStack(Material.EMERALD_BLOCK, 1);
+    public static final String CLAIM_COST_STRING = "one emerald block";
 
     private Document packInfo;
 
@@ -35,6 +40,20 @@ public class Pack {
         }
         return null;
     }
+
+    public ArrayList<String> getElders() {
+        ArrayList<String> elders = new ArrayList<>();
+
+        ArrayList<Document> members = (ArrayList<Document>) packInfo.get("Members");
+        for (Document doc : members) {
+            if (doc.getString("Role").equals("Elder")) {
+                OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(doc.getString("Name")));
+                elders.add(player.getName());
+            }
+        }
+        return elders;
+    }
+
 
     public UUID getUUID(String playerName) {
         ArrayList<Document> members = (ArrayList<Document>) packInfo.get("Members");

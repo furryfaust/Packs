@@ -42,6 +42,12 @@ public class Command implements CommandExecutor {
                 return claim(player, commandSender, args);
             case "declaim":
                 return declaim(player, commandSender, args);
+            case "promote":
+                return promote(player, commandSender, args);
+            case "demote":
+                return demote(player, commandSender, args);
+            default:
+                message(commandSender, "&cUnrecognized command");
         }
         return false;
     }
@@ -239,7 +245,7 @@ public class Command implements CommandExecutor {
         }
 
         Pack pack = new Pack(pl.db.getPack(player.getUniqueId()));
-        if (pack == null) {
+        if (!pack.exists()) {
             message(player, "&cYou are not in a pack.");
             return false;
         }
@@ -250,7 +256,7 @@ public class Command implements CommandExecutor {
         }
 
         pl.db.leavePack(player.getUniqueId());
-        message(player, "&aYou have left your pack.");
+        pack.sendAll("&a" + player.getName() + " have left your pack.");
         return true;
     }
 
@@ -261,7 +267,7 @@ public class Command implements CommandExecutor {
         }
 
         Pack pack = new Pack(pl.db.getPack(player.getUniqueId()));
-        if (pack == null) {
+        if (!pack.exists()) {
             message(player, "&cYou are not in a pack.");
             return false;
         }
@@ -276,9 +282,16 @@ public class Command implements CommandExecutor {
             return false;
         }
 
+        if (!player.getInventory().contains(Pack.CLAIM_COST)) {
+            message(player, "&cYou need " + Pack.CLAIM_COST_STRING + " in order to claim land.");
+            return false;
+        }
+
+        player.getInventory().remove(Pack.CLAIM_COST);
+        player.updateInventory();
+
         pl.db.claim(player.getLocation().getChunk(), pack.getName());
-        pack.sendAll("&a" + player.getName() + " claimed land at X: " + (int) player.getLocation().getX() + " Y: "
-                + (int) player.getLocation().getZ() + " World: " + player.getWorld().getName() + ".");
+        pack.send(player, "&aYou claimed land here for " + Pack.CLAIM_COST_STRING + ".");
         return true;
     }
 
@@ -289,7 +302,7 @@ public class Command implements CommandExecutor {
         }
 
         Pack pack = new Pack(pl.db.getPack(player.getUniqueId()));
-        if (pack == null) {
+        if (!pack.exists()) {
             message(player, "&cYou are not in a pack.");
             return false;
         }
@@ -306,10 +319,18 @@ public class Command implements CommandExecutor {
         }
 
         pl.db.declaim(player.getLocation().getChunk());
-        pack.sendAll("&a" + player.getName() + " declaimed land at X: " + (int) player.getLocation().getX() + " Y: "
-                + (int) player.getLocation().getZ() + " World: " + player.getWorld().getName() + ".");
+        pack.send(player, "&cYou declaimed land here.");
         return true;
     }
+
+    public boolean promote(Player player, CommandSender commandSender, String[] args) {
+        return true;
+    }
+
+    public boolean demote(Player player, CommandSender commandSender, String[] args) {
+        return true;
+    }
+
 
     private void message(CommandSender sender, String message) {
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&9&lPacks&7] " + message));

@@ -95,10 +95,23 @@ public class Database {
 
     public void leavePack(UUID uuid) {
         Document member = new Document()
-                .append("Name", uuid.toString())
-                .append("Role", "Beta");
+                .append("Name", uuid.toString());
 
         collection.updateOne(new Document("Members", member), new Document("$pull", new Document("Members", member)));
+    }
+
+    public void toElder(UUID uuid) {
+        Document packQuery = new Document("Members.Name", uuid.toString());
+
+        collection.updateOne(packQuery,
+                new Document("$set", new Document("Members.$.Role", "Elder")));
+    }
+
+    public void toMember(UUID uuid) {
+        Document packQuery = new Document("Members.Name", uuid.toString());
+
+        collection.updateOne(packQuery,
+                new Document("$set", new Document("Members.$.Role", "Member")));
     }
 
     public Document getPackAtChunk(Chunk chunk) {
